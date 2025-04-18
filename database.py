@@ -10,7 +10,9 @@ username = os.getenv("USR")
 password = os.getenv("PWD")
 port_id = os.getenv("PORT")
 
-DATABASE_URL = f"postgresql://{username}:{password}@{hostname}:{port_id}/{database}"
+DATABASE_URL = (
+    f"postgresql+psycopg2://{username}:{password}@{hostname}:{port_id}/{database}"
+)
 
 engine = create_engine(DATABASE_URL, echo=True)
 
