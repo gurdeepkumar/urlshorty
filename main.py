@@ -78,7 +78,7 @@ def shorten_url(request: CreateRequest, session: Session = Depends(get_session))
     session.commit()
     session.refresh(url)
 
-    return {"short_url": f"http://localhost:8000/{url.short_code}"}
+    return {"short_url": f"https://urlshorty.gurdeepkumar.com/{url.short_code}"}
 
 
 # Get the orignal URL
