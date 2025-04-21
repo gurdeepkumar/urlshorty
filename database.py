@@ -24,5 +24,9 @@ def get_session():
 
 def init_db():
     inspector = inspect(engine)
-    if not inspector.has_table("url"):
+    if (
+        not inspector.has_table("url")
+        or not inspector.has_table("user")
+        or not inspector.has_table("refreshtoken")
+    ):
         SQLModel.metadata.create_all(engine)

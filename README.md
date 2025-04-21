@@ -13,11 +13,11 @@ URL Shorty is a lightweight RESTful API for creating and managing shortened URLs
 ## API Endpoints
 
 - `GET /` - Server and DB health check
-- `GET /list/` - List all URLs
-- `POST /shorten/` - Create a new short URL
-- `GET /shortCode` - Retrieve original URL
-- `PATCH /shortCode` - Update an existing short URL
-- `DELETE /shortCode` - Delete a short URL
+- `GET /url/list/` - List all URLs
+- `POST /url/shorten/` - Create a new short URL
+- `GET /url/shortCode` - Retrieve original URL
+- `PATCH /url/shortCode` - Update an existing short URL
+- `DELETE /url/shortCode` - Delete a short URL
 
 ## Tech Stack
 
