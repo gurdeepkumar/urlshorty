@@ -3,6 +3,7 @@ from typing import Optional, List
 import datetime
 
 
+# URL model
 class URL(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     original_url: str
@@ -13,6 +14,7 @@ class URL(SQLModel, table=True):
     user: Optional["User"] = Relationship(back_populates="urls")
 
 
+# Refresh token model
 class RefreshToken(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     token: str
@@ -22,6 +24,7 @@ class RefreshToken(SQLModel, table=True):
     user: Optional["User"] = Relationship(back_populates="refresh_tokens")
 
 
+# User model
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(index=True, unique=True)

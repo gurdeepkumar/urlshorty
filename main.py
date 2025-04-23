@@ -3,7 +3,6 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 
-
 from sqlmodel import Session, select
 from models import URL, User
 from database import get_session, init_db
@@ -19,6 +18,7 @@ from schemas import (
     UserResponse,
     DeleteUserRequest,
 )
+
 import auth
 
 # FastAPI Tags
@@ -38,95 +38,8 @@ app.title = "URL Shorty"
 # Check if model/table exists in DB
 init_db()
 
-
+# Dependency for user auth
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/usr/login")
-
-
-# *** UrlShorty Features ***
-# Server and DB check
-@app.get("/", tags=["Features"])
-def server_check(session: Session = Depends(get_session)):
-    try:
-        session.exec(select(URL))
-        return {"status": "Server running and Database connection successful"}
-    except:
-        raise HTTPException(
-            status_code=500, detail=f"Server running. But, Database connection failed"
-        )
-
-
-# List all urls
-@app.get("/url/list/", tags=["Features"])
-def List_url(session: Session = Depends(get_session)):
-    rows = session.exec(select(URL)).all()
-    rows_json = jsonable_encoder(rows)
-    return rows_json
-
-
-# Create a short url
-@app.post("/url/shorten/", tags=["Features"])
-def shorten_url(request: CreateRequest, session: Session = Depends(get_session)):
-    original_url = normalize_url(request.original_url)
-    short_code = request.short_code
-
-    if not short_code.isalpha():
-        raise HTTPException(status_code=403, detail="Only use alphabtes for short code")
-
-    statement = select(URL).where(URL.short_code == short_code)
-
-    if session.exec(statement).first():
-        raise HTTPException(status_code=403, detail="Short code is already used")
-
-    url = URL(original_url=original_url, short_code=short_code)
-    session.add(url)
-    session.commit()
-    session.refresh(url)
-
-    return {"short_url": f"https://urlshorty.gurdeepkumar.com/url/{url.short_code}"}
-
-
-# Get the orignal URL
-@app.get("/url/{short_code}", tags=["Features"])
-def redirect_to_url(short_code: str, session: Session = Depends(get_session)):
-    url = session.exec(select(URL).where(URL.short_code == short_code)).first()
-    if not url:
-        raise HTTPException(status_code=404, detail="Short URL not found")
-
-    return RedirectResponse(url.original_url, status_code=307)
-
-
-# Delete a URL with short code
-@app.delete("/url/", tags=["Features"])
-def delete_url(request: DeleteRequest, session: Session = Depends(get_session)):
-    short_code = request.short_code
-    statement = select(URL).where(URL.short_code == short_code)
-    url = session.exec(statement).first()
-
-    if not url:
-        raise HTTPException(status_code=404, detail="URL not found")
-
-    session.delete(url)
-    session.commit()
-    return {"message": "URL deleted successfully"}
-
-
-# Update a URL with short code
-@app.patch("/url/", tags=["Features"])
-def update_url(request: UpdateRequest, session: Session = Depends(get_session)):
-    short_code = request.short_code
-    updated_url = normalize_url(request.updated_url)
-    statement = select(URL).where(URL.short_code == short_code)
-    url = session.exec(statement).first()
-
-    if not url:
-        raise HTTPException(status_code=404, detail="URL not found")
-
-    url.original_url = updated_url
-    session.add(url)
-    session.commit()
-    session.refresh(url)
-
-    return {"message": "URL updated successfully", "data": url}
 
 
 # *** User authentication and authorization ***
@@ -145,17 +58,16 @@ def register(user: UserCreate, session: Session = Depends(get_session)):
     return {"id": db_user.id, "username": db_user.username}
 
 
-# Login user and return access token
+# Login user and return access token and refresh token
 @app.post("/usr/login", tags=["Authentication"])
 def login(data: LoginRequest, session: Session = Depends(get_session)):
     user = session.exec(select(User).where(User.username == data.username)).first()
     if not user or not auth.verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    access_token = auth.create_access_token({"sub": user.username})
     refresh_token = auth.create_refresh_token({"sub": user.username})
+    access_token = auth.create_access_token({"sub": user.username})
 
-    # Optional: Save refresh_token in DB for tracking
     auth.save_refresh_token(user.username, refresh_token, session)
 
     return {
@@ -165,7 +77,7 @@ def login(data: LoginRequest, session: Session = Depends(get_session)):
     }
 
 
-# Return currently logged user
+# Takes access token and return user for it
 @app.get("/usr/me", tags=["Authentication"])
 def get_current_user(
     token: str = Depends(oauth2_scheme),
@@ -179,9 +91,10 @@ def get_current_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return UserResponse(username=user.username)
+    return UserResponse(username=user.username, id=user.id)
 
 
+# Takes refresh token and return new access token
 @app.post("/usr/refresh", tags=["Authentication"])
 def refresh_token_endpoint(refresh_token: str):
     try:
@@ -191,13 +104,14 @@ def refresh_token_endpoint(refresh_token: str):
         raise HTTPException(status_code=401, detail=str(e))
 
 
+# Delete refresh token from db
 @app.post("/usr/logout", tags=["Authentication"])
 def logout(refresh_token: str, session: Session = Depends(get_session)):
-    # Delete refresh token from DB
     auth.delete_refresh_token(refresh_token, session)
     return {"message": "Logged out successfully"}
 
 
+# Delete user and related urls
 @app.delete("/usr/delete", tags=["Authentication"])
 def delete_user(data: DeleteUserRequest, session: Session = Depends(get_session)):
     user = session.exec(select(User).where(User.username == data.username)).first()
@@ -208,3 +122,125 @@ def delete_user(data: DeleteUserRequest, session: Session = Depends(get_session)
     session.delete(user)
     session.commit()
     return {"message": f"User '{data.username}' and related data deleted successfully."}
+
+
+# *** UrlShorty Features ***
+# Server and DB check
+@app.get("/", tags=["Features"])
+def server_check(
+    user: UserResponse = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    try:
+        session.exec(select(URL))
+        return {
+            "user": user.username,
+            "status": "Server running and Database connection successful",
+        }
+    except:
+        raise HTTPException(status_code=500, detail=f"Database error.")
+
+
+# List all urls
+@app.get("/url/list/", tags=["Features"])
+def List_url(
+    user: UserResponse = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    rows = session.exec(select(URL).where(URL.user_id == user.id)).all()
+    rows_json = jsonable_encoder(rows)
+    return rows_json
+
+
+# Create a short url
+@app.post("/url/shorten/", tags=["Features"])
+def shorten_url(
+    request: CreateRequest,
+    session: Session = Depends(get_session),
+    user: UserResponse = Depends(get_current_user),
+):
+    original_url = normalize_url(request.original_url)
+    short_code = request.short_code
+
+    if not short_code.isalpha():
+        raise HTTPException(status_code=403, detail="Only use alphabtes for short code")
+
+    statement = (
+        select(URL).where(URL.user_id == user.id).where(URL.short_code == short_code)
+    )
+
+    if session.exec(statement).first():
+        raise HTTPException(
+            status_code=403, detail="Short code is already used by this user."
+        )
+
+    url = URL(original_url=original_url, short_code=short_code, user_id=user.id)
+    session.add(url)
+    session.commit()
+    session.refresh(url)
+
+    return url.__dict__
+    # return {"short_url": f"https://urlshorty.gurdeepkumar.com/url/{url.short_code}"}
+
+
+# Get the orignal URL
+@app.get("/url/{short_code}", tags=["Features"])
+def redirect_to_url(
+    short_code: str,
+    user: UserResponse = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    url = session.exec(
+        select(URL).where(URL.user_id == user.id).where(URL.short_code == short_code)
+    ).first()
+    if not url:
+        raise HTTPException(status_code=404, detail="Short URL not found")
+
+    return url.__dict__
+    # return RedirectResponse(url.original_url, status_code=307)
+
+
+# Delete a URL with short code
+@app.delete("/url/", tags=["Features"])
+def delete_url(
+    request: DeleteRequest,
+    user: UserResponse = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    short_code = request.short_code
+    statement = (
+        select(URL).where(URL.user_id == user.id).where(URL.short_code == short_code)
+    )
+    url = session.exec(statement).first()
+
+    if not url:
+        raise HTTPException(status_code=404, detail="URL not found")
+
+    session.delete(url)
+    session.commit()
+    return {"message": "URL deleted successfully"}
+
+
+# Update a URL with short code
+@app.patch("/url/", tags=["Features"])
+def update_url(
+    request: UpdateRequest,
+    user: UserResponse = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    short_code = request.short_code
+    updated_url = normalize_url(request.updated_url)
+    statement = (
+        select(URL).where(URL.user_id == user.id).where(URL.short_code == short_code)
+    )
+    url = session.exec(statement).first()
+
+    if not url:
+        raise HTTPException(status_code=404, detail="URL not found")
+
+    url.original_url = updated_url
+    session.add(url)
+    session.commit()
+    session.refresh(url)
+
+    return {"message": "URL updated successfully", "data": url}

@@ -1,9 +1,11 @@
 from sqlmodel import SQLModel, create_engine, Session, inspect
+
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
+# App settings
 hostname = os.getenv("HOST")
 database = os.getenv("DB")
 username = os.getenv("USR")
@@ -17,11 +19,13 @@ DATABASE_URL = (
 engine = create_engine(DATABASE_URL, echo=True)
 
 
+# Create session and close automaticall with DB
 def get_session():
     with Session(engine) as session:
         yield session
 
 
+# Initialize the DB
 def init_db():
     inspector = inspect(engine)
     if (

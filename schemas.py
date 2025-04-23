@@ -1,7 +1,13 @@
 from pydantic import BaseModel
 
 
+# User Schemas
 class UserCreate(BaseModel):
+    username: str
+    password: str
+
+
+class LoginRequest(BaseModel):
     username: str
     password: str
 
@@ -11,12 +17,8 @@ class Token(BaseModel):
     token_type: str
 
 
-class LoginRequest(BaseModel):
-    username: str
-    password: str
-
-
 class UserResponse(BaseModel):
+    id: int
     username: str
 
 
@@ -25,6 +27,7 @@ class DeleteUserRequest(BaseModel):
     password: str
 
 
+# Url Shorty Schemas
 class CreateRequest(BaseModel):
     original_url: str
     short_code: str
