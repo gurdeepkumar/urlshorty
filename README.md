@@ -1,6 +1,12 @@
 # URL Shorty
 
-**URL Shorty** is a lightweight RESTful API that lets users create and manage shortened URLs. It supports **custom short codes** using human-friendly words, making URLs easier to share and remember.
+About
+-----
+
+**URL Shorty** is a lightweight and high-performance RESTful API built with FastAPI that allows users to create and manage shortened URLs. It supports custom short codes using human-friendly words and provides secure user registration and authentication to manage personal links. Designed for speed and simplicity.
+
+
+**Frontend:** [URLShorty CLI](./frontend_cli)
 
 ---
 
@@ -13,8 +19,6 @@
 - 📜 List all stored URLs
 - 👤 User registration and OAuth2-based authorization
 
-> **Note:** All endpoints for URL Shorty features require **Bearer token ( Authorization: Bearer TOKEN_HERE ) headers**. Users must authenticate using bearer token to access any feature.
-
 ---
 
 > After logging in, use the token as a `Bearer` token in the `Authorization` header to access the URL Shorty features:
@@ -26,48 +30,8 @@
 
 # 📚 API Endpoints
 
-### 🛠 Server & Health Check _(Requires Authorization)_
 
-- `GET /`  
-  _Check if the server and database are healthy._
-
-
-
-### 🔗 URL Management _(Requires Authorization)_
-
-- `GET /url/list/`  
-  _Retrieve a list of all shortened URLs._
-
-- `POST /url/shorten/`  
-  _Create a new short URL with a custom short code._  
-  **Request Body Example:**
-  ```json
-  {
-    "original_url": "https://example.com",
-    "short_code": "mycustomcode"
-  }
-  ```
-
-- `GET /url/{shortCode}`  
-  _Retrieve the original URL for the given `shortCode`._
-
-- `PATCH /url/{shortCode}`  
-  _Update the original URL for a given `shortCode`._  
-  **Request Body Example:**
-  ```json
-  {
-    "short_code": "mycustomcode",
-    "updated_url": "https://new-destination.com"
-  }
-  ```
-
-- `DELETE /url/{shortCode}`  
-  _Delete the shortened URL associated with the given `shortCode`._
-
----
-
-
-# 👤 User Management
+## 👤 User Management
 
 ### 🔹 POST `/usr/register`  
 **Description:** Register a new user.  
@@ -82,7 +46,7 @@
 ---
 
 ### 🔹 POST `/usr/login`  
-**Description:** Obtain OAuth2 access token and refresh token after login.  
+**Description:** Obtain access token and refresh token after login.  
 **Form Data Example:**
 ```json
 {
@@ -94,7 +58,7 @@
 ---
 
 ### 🔹 GET `/usr/me`  
-**Description:** Get current logged-in user's details from access token.  
+**Description:** Get current logged-in user's details with access token.  
 **Headers:**
 ```
 Authorization: Bearer <access_token>
@@ -134,6 +98,51 @@ Authorization: Bearer <access_token>
 }
 ```
 
+---
+
+### 🛠 Server & Health Check _(Requires Authorization)_
+
+- `GET /`  
+  _Check if the server and database are healthy._
+
+---
+
+## 🔗 URL Management _(Requires Authorization)_
+
+- `GET /url/list/`  
+  _Retrieve a list of all shortened URLs._
+
+- `POST /url/shorten/`  
+  _Create a new short URL with a custom short code._  
+  **Request Body Example:**
+  ```json
+  {
+    "original_url": "https://example.com",
+    "short_code": "mycustomcode"
+  }
+  ```
+
+- `GET /url/{shortCode}`  
+  _Retrieve the original URL for the given `shortCode`._
+
+- `PATCH /url/`  
+  _Update the original URL for a given `shortCode`._  
+  **Request Body Example:**
+  ```json
+  {
+    "short_code": "mycustomcode",
+    "updated_url": "https://new-destination.com"
+  }
+  ```
+
+- `DELETE /url/`  
+  _Delete the shortened URL associated with the given `shortCode`._
+  **Request Body Example:**
+  ```json
+  {
+    "short_code": "mycustomcode",
+  }
+  ```
 
 ---
 
@@ -148,6 +157,8 @@ Authorization: Bearer <access_token>
 - **Python-JOSE** – JWT creation and verification  
 - **OAuth2** – Secure authentication and token-based access  
 
-
 ---
+## 🖥️ Frontend: URLShorty CLI
+**Directory:** `/frontend_cli`
 
+You can use the command-line interface (CLI) frontend to interact with the URLShorty API directly from your terminal. This tool supports all core URLShorty features, allowing you to manage your links efficiently without leaving the command line.

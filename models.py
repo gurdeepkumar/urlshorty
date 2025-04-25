@@ -7,7 +7,7 @@ import datetime
 class URL(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     original_url: str
-    short_code: str = Field(index=True, unique=True)
+    short_code: str = Field(index=True)
     created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
 
     user_id: Optional[int] = Field(default=None, foreign_key="user.id")

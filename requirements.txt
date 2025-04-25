@@ -2,9 +2,9 @@ fastapi
 uvicorn
 sqlmodel
 psycopg2
-dotenv
 gunicorn
 python-jose[cryptography]
 passlib[bcrypt]
 pydantic
 python-multipart
+python-dotenv

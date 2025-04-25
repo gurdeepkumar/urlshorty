@@ -1,6 +1,6 @@
+from curses.ascii import isalpha
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 
 from sqlmodel import Session, select
@@ -15,8 +15,10 @@ from schemas import (
     DeleteRequest,
     UpdateRequest,
     LoginRequest,
+    LogoutRequest,
     UserResponse,
     DeleteUserRequest,
+    RefreshRequest,
 )
 
 import auth
@@ -46,6 +48,18 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/usr/login")
 # Register User
 @app.post("/usr/register", tags=["Authentication"])
 def register(user: UserCreate, session: Session = Depends(get_session)):
+    # Username and password len and characters check
+    if not user.username.isalpha():
+        raise HTTPException(status_code=400, detail="Username must be only alphabets")
+    elif len(user.username) <= 5:
+        raise HTTPException(
+            status_code=400, detail="Username must be 6 or more characters"
+        )
+    elif len(user.password) <= 7:
+        raise HTTPException(
+            status_code=400, detail="Password must be minimum 8 characters"
+        )
+
     existing = session.exec(select(User).where(User.username == user.username)).first()
     if existing:
         raise HTTPException(status_code=400, detail="Username already registered")
@@ -96,9 +110,9 @@ def get_current_user(
 
 # Takes refresh token and return new access token
 @app.post("/usr/refresh", tags=["Authentication"])
-def refresh_token_endpoint(refresh_token: str):
+def refresh_token_endpoint(data: RefreshRequest):
     try:
-        tokens = auth.refresh_token(refresh_token)
+        tokens = auth.refresh_token(data.refresh_token)
         return tokens
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
@@ -106,8 +120,8 @@ def refresh_token_endpoint(refresh_token: str):
 
 # Delete refresh token from db
 @app.post("/usr/logout", tags=["Authentication"])
-def logout(refresh_token: str, session: Session = Depends(get_session)):
-    auth.delete_refresh_token(refresh_token, session)
+def logout(data: LogoutRequest, session: Session = Depends(get_session)):
+    auth.delete_refresh_token(data.refresh_token, session)
     return {"message": "Logged out successfully"}
 
 
@@ -116,7 +130,10 @@ def logout(refresh_token: str, session: Session = Depends(get_session)):
 def delete_user(data: DeleteUserRequest, session: Session = Depends(get_session)):
     user = session.exec(select(User).where(User.username == data.username)).first()
 
-    if not user or not auth.verify_password(data.password, user.hashed_password):
+    if not user:
+        raise HTTPException(status_code=401, detail="User doesn't exist.")
+
+    if not auth.verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
     session.delete(user)
