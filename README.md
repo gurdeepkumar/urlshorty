@@ -28,12 +28,12 @@ About
 
 ---
 
-# 📚 API Endpoints
+## 📚 API Endpoints
 
 
-## 👤 User Management
+### 👤 User Management
 
-### 🔹 POST `/usr/register`  
+#### 🔹 POST `/usr/register`  
 **Description:** Register a new user.  
 **Request Body Example:**
 ```json
@@ -45,9 +45,9 @@ About
 
 ---
 
-### 🔹 POST `/usr/login`  
+#### 🔹 POST `/usr/login`  
 **Description:** Obtain access token and refresh token after login.  
-**Form Data Example:**
+**Request Body Example:**
 ```json
 {
   "username": "ExampleUser",
@@ -57,7 +57,7 @@ About
 
 ---
 
-### 🔹 GET `/usr/me`  
+#### 🔹 GET `/usr/me`  
 **Description:** Get current logged-in user's details with access token.  
 **Headers:**
 ```
@@ -66,7 +66,7 @@ Authorization: Bearer <access_token>
 
 ---
 
-### 🔹 POST `/usr/refresh`  
+#### 🔹 POST `/usr/refresh`  
 **Description:** Use a refresh token to obtain a new access token.  
 **Request Body Example:**
 ```json
@@ -77,7 +77,7 @@ Authorization: Bearer <access_token>
 
 ---
 
-### 🔹 POST `/usr/logout`  
+#### 🔹 POST `/usr/logout`  
 **Description:** Logs out the current user from backend by blacklisting the refresh token.  
 **Request Body Example:**
 ```json
@@ -88,7 +88,7 @@ Authorization: Bearer <access_token>
 
 ---
 
-### 🔹 DELETE `/usr/delete`  
+#### 🔹 DELETE `/usr/delete`  
 **Description:** Deletes the user account and related url.  
 **Request Body Example:**
 ```json
@@ -102,47 +102,47 @@ Authorization: Bearer <access_token>
 
 ### 🛠 Server & Health Check _(Requires Authorization)_
 
-- `GET /`  
-  _Check if the server and database are healthy._
+#### 🔹 GET `/`  
+**Description:** Check if the server and database are healthy._
 
 ---
 
-## 🔗 URL Management _(Requires Authorization)_
+### 🔗 URL Management _(Requires Authorization)_
 
-- `GET /url/list/`  
-  _Retrieve a list of all shortened URLs._
+#### 🔹 GET `/url/list/`  
+**Description:** Retrieve a list of all shortened URLs.
 
-- `POST /url/shorten/`  
-  _Create a new short URL with a custom short code._  
-  **Request Body Example:**
-  ```json
-  {
-    "original_url": "https://example.com",
-    "short_code": "mycustomcode"
-  }
-  ```
+#### 🔹 POST `/url/shorten/`  
+**Description:** Create a new short URL with a custom short code.  
+**Request Body Example:**
+```json
+{
+  "original_url": "https://example.com",
+  "short_code": "mycustomcode"
+}
+```
 
-- `GET /url/{shortCode}`  
-  _Retrieve the original URL for the given `shortCode`._
+#### 🔹 GET `/url/{shortCode}`  
+**Description:** Retrieve the original URL for the given `shortCode`.
 
-- `PATCH /url/`  
-  _Update the original URL for a given `shortCode`._  
-  **Request Body Example:**
-  ```json
-  {
-    "short_code": "mycustomcode",
-    "updated_url": "https://new-destination.com"
-  }
-  ```
+#### 🔹 PATCH `/url/`  
+**Description:** Update the original URL for a given `shortCode`.  
+**Request Body Example:**
+```json
+{
+  "short_code": "mycustomcode",
+  "updated_url": "https://new-destination.com"
+}
+```
 
-- `DELETE /url/`  
-  _Delete the shortened URL associated with the given `shortCode`._
-  **Request Body Example:**
-  ```json
-  {
-    "short_code": "mycustomcode",
-  }
-  ```
+#### 🔹 DELETE `/url/`  
+**Description:** Delete the shortened URL associated with the given `shortCode`.
+**Request Body Example:**
+```json
+{
+  "short_code": "mycustomcode",
+}
+```
 
 ---
 

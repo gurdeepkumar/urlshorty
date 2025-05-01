@@ -2,13 +2,46 @@
 
 A command-line interface (CLI) frontend for interacting with the URLShorty API. This tool allows users to register, log in, manage their user accounts, and create/manage shortened URLs.
 
-### ⚠️ Note
+## Prerequisites
 
-> Users must log in to use all features.
+Before you begin, make sure you have the following installed:
 
----
+- Python (version 3.6 or higher recommended)
+- pip (Python package installer)
+
+## Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/gurdeepkumar/urlshorty.git
+cd urlshorty/frontend_cli
+```
+
+2. Create a virtual environment:
+
+```bash
+python -m venv venv
+source venv/bin/activate  
+# On Windows use `venv\Scripts\activate`
+```
+
+3. Install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+4. Create a file with name .env in the same folder(urlshorty/frontend_cli) and add folliwng information:
+
+```bash
+BASE_URL = "https://urlshorty.gurdeepkumar.com"
+# Update base url if you are running URLShorty on local machine.
+```
 
 ## 📦 User Commands
+
+##### Make sure you are in urlshorty/frontend_cli folder.
 
 ### 🔐 Register a New User
 ```bash
@@ -39,6 +72,8 @@ python urlshorty_cli.py user delete --username <username> --password <password>
 
 ## 🌐 URL Commands
 
+##### User must be logged in to use the following features.
+
 ### ❤️ Check API Health
 ```bash
 python urlshorty_cli.py url health
@@ -68,15 +103,6 @@ python urlshorty_cli.py url update --short_code <short_code> --updated_url <upda
 ```bash
 python urlshorty_cli.py url delete --short_code <short_code>
 ```
-
----
-
-## 🧪 Requirements
-
-- Python 3.7+
-- `requests` and `python-dotenv` Python packages
-- Access to the URLShorty API
-- CLI authentication token after login
 
 ---
 
