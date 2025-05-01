@@ -100,10 +100,10 @@ Authorization: Bearer <access_token>
 
 ---
 
-### 🛠 Server & Health Check _(Requires Authorization)_
+### 🛠 Server & Health Check
 
-#### 🔹 GET `/`  
-**Description:** Check if the server and database are healthy._
+#### 🔹 GET `/health/`  
+**Description:** Check if the server and database are healthy.
 
 ---
 

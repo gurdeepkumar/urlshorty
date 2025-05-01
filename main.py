@@ -1,5 +1,6 @@
-from curses.ascii import isalpha
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer
 
@@ -37,11 +38,20 @@ tags_metadata = [
 app = FastAPI(openapi_tags=tags_metadata)
 app.title = "URL Shorty"
 
+# For serving templates
+templates = Jinja2Templates(directory="templates")
+
 # Check if model/table exists in DB
 init_db()
 
 # Dependency for user auth
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/usr/login")
+
+
+# Index Page
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 # *** User authentication and authorization ***
@@ -141,23 +151,21 @@ def delete_user(data: DeleteUserRequest, session: Session = Depends(get_session)
     return {"message": f"User '{data.username}' and related data deleted successfully."}
 
 
-# *** UrlShorty Features ***
 # Server and DB check
-@app.get("/", tags=["Features"])
+@app.get("/health/", tags=["Features"])
 def server_check(
-    user: UserResponse = Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
     try:
-        session.exec(select(URL))
+        session.exec(select(1))
         return {
-            "user": user.username,
             "status": "Server running and Database connection successful",
         }
     except:
         raise HTTPException(status_code=500, detail=f"Database error.")
 
 
+# *** UrlShorty Features ***
 # List all urls
 @app.get("/url/list/", tags=["Features"])
 def List_url(

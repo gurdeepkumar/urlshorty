@@ -216,31 +216,17 @@ def delete_account(args):
         print(res.json()["detail"])
 
 
-# URL-related functions
-
-
+# API health check
 def check_health(args):
-
-    access_token = get_access_token()
-    if not access_token:
-        return
-
-    header = get_header(access_token)
-    res = requests.get(f"{BASE_URL}/", headers=header)
-
-    if res.status_code == 401:
-        if "detail" in res.json() and res.json()["detail"] == "Invalid token":
-            new_access_token = refresh()
-            new_header = get_header(new_access_token)
-            res = requests.get(f"{BASE_URL}/", headers=new_header)
-
+    res = requests.get(f"{BASE_URL}/health/")
     if res.status_code == 200:
-        print(f"Hi, {res.json()['user']}. {res.json()['status']}")
+        print(f"{res.json()['status']}")
 
     else:
         print(res.json()["detail"])
 
 
+# URL-related functions
 def list_urls(args):
     access_token = get_access_token()
     if not access_token:

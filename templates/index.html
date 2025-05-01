@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Shorty - API Overview</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #121212;
+        color: #f1f1f1;
+      }
+      .section {
+        padding: 3rem 0;
+      }
+      .feature-icon {
+        font-size: 2rem;
+        color: #0d6efd;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container text-light py-5">
+      <header class="text-center mb-5">
+        <h1 class="display-4">🔗 URL Shorty</h1>
+        <p class="lead">Fast, secure, and human-friendly URL shortening API</p>
+      </header>
+
+      <section class="section">
+        <h2 class="mb-4">🚀 Features</h2>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item bg-dark text-light">
+            🔗 Create short URLs with custom codes
+          </li>
+          <li class="list-group-item bg-dark text-light">
+            🔍 Retrieve original URLs by short code
+          </li>
+          <li class="list-group-item bg-dark text-light">
+            ✏️ Update existing short codes
+          </li>
+          <li class="list-group-item bg-dark text-light">
+            ❌ Delete short URLs
+          </li>
+          <li class="list-group-item bg-dark text-light">
+            📜 List all stored URLs
+          </li>
+          <li class="list-group-item bg-dark text-light">
+            👤 Register and log in securely
+          </li>
+        </ul>
+      </section>
+
+      <!-- Only replace the API Overview section inside your page with the updated section below -->
+
+      <section class="section">
+        <h2 class="mb-4">📚 API Overview</h2>
+
+        <div class="mb-5">
+          <h4 class="text-info">🛠 Server & Health</h4>
+          <h5><code>GET /</code></h5>
+          <p><strong>Description:</strong> Check server and DB health</p>
+        </div>
+
+        <div class="mb-5">
+          <h4 class="text-info">👤 User Management</h4>
+
+          <div class="mb-3">
+            <h5><code>POST /usr/register</code></h5>
+            <p><strong>Description:</strong> Register a new user</p>
+            <p><strong>Request Body Example:</strong></p>
+            <pre><code>{
+  "username": "ExampleUser",
+  "password": "ExamplePassword"
+}</code></pre>
+          </div>
+
+          <div class="mb-3">
+            <h5><code>POST /usr/login</code></h5>
+            <p>
+              <strong>Description:</strong> Obtain access and refresh tokens
+            </p>
+            <pre><code>{
+  "username": "ExampleUser",
+  "password": "ExamplePassword"
+}</code></pre>
+          </div>
+
+          <div class="mb-3">
+            <h5><code>GET /usr/me</code></h5>
+            <p><strong>Description:</strong> Get logged-in user info</p>
+            <p><strong>Headers:</strong></p>
+            <pre><code>Authorization: Bearer &lt;access_token&gt;</code></pre>
+          </div>
+
+          <div class="mb-3">
+            <h5><code>POST /usr/refresh</code></h5>
+            <p><strong>Description:</strong> Refresh access token</p>
+            <pre><code>{
+  "refresh_token": "&lt;refresh_token&gt;"
+}</code></pre>
+          </div>
+
+          <div class="mb-3">
+            <h5><code>POST /usr/logout</code></h5>
+            <p><strong>Description:</strong> Logout and revoke refresh token</p>
+            <pre><code>{
+  "refresh_token": "&lt;refresh_token&gt;"
+}</code></pre>
+          </div>
+
+          <div class="mb-3">
+            <h5><code>DELETE /usr/delete</code></h5>
+            <p><strong>Description:</strong> Delete user and URLs</p>
+            <pre><code>{
+  "username": "ExampleUser",
+  "password": "ExamplePassword"
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="mb-5">
+          <h4 class="text-info">🔗 URL Management</h4>
+
+          <div class="mb-3">
+            <h5><code>GET /url/list/</code></h5>
+            <p><strong>Description:</strong> Retrieve list of shortened URLs</p>
+          </div>
+
+          <div class="mb-3">
+            <h5><code>POST /url/shorten/</code></h5>
+            <p><strong>Description:</strong> Create a short URL</p>
+            <pre><code>{
+  "original_url": "https://example.com",
+  "short_code": "mycustomcode"
+}</code></pre>
+          </div>
+
+          <div class="mb-3">
+            <h5><code>GET /url/{shortCode}</code></h5>
+            <p><strong>Description:</strong> Retrieve original URL</p>
+          </div>
+
+          <div class="mb-3">
+            <h5><code>PATCH /url/</code></h5>
+            <p><strong>Description:</strong> Update short URL</p>
+            <pre><code>{
+  "short_code": "mycustomcode",
+  "updated_url": "https://new-destination.com"
+}</code></pre>
+          </div>
+
+          <div class="mb-3">
+            <h5><code>DELETE /url/</code></h5>
+            <p><strong>Description:</strong> Delete shortened URL</p>
+            <pre><code>{
+  "short_code": "mycustomcode"
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>🖥️ CLI Frontend</h2>
+        <p class="lead">
+          Use the <code>frontend_cli</code> to interact with the API via
+          terminal.
+          <a
+            class="text-light"
+            href="https://github.com/gurdeepkumar/urlshorty/tree/main/frontend_cli"
+            >Learn more here.</a
+          >
+        </p>
+      </section>
+
+      <footer class="text-center text-light mt-5 pt-3 border-top">
+        <p>&copy; 2025 URL Shorty API</p>
+      </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

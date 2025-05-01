@@ -8,3 +8,4 @@ passlib[bcrypt]
 pydantic
 python-multipart
 python-dotenv
+jinja2
