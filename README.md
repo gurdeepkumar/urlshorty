@@ -3,7 +3,7 @@
 About
 -----
 
-**URL Shorty** is a lightweight and high-performance RESTful API built with FastAPI that allows users to create and manage shortened URLs. It supports custom short codes using human-friendly words and provides secure user registration and authentication to manage personal links. Designed for speed and simplicity.
+**URL Shorty** is a RESTful API built with FastAPI that allows users to create and manage shortened URLs. It supports custom short codes using human-friendly words and provides secure user registration and authentication to manage personal links. Designed for speed and simplicity.
 
 
 **Frontend:** [URLShorty CLI](./frontend_cli)
